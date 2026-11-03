@@ -1,0 +1,32 @@
+{
+  "experiment_id": "exp01_partial_finetune_resnet50_100pct",
+  "experiment_name": "Partial Fine-tuning (last 2 blocks) / ResNet50 / 100% data",
+  "dataset_sizes": {
+    "train": 1020,
+    "val": 1020,
+    "test": 6149
+  },
+  "best_val_acc": 0.9323529411764706,
+  "best_epoch": 16,
+  "total_train_time_sec": 1225.6365728378296,
+  "avg_epoch_time_sec": 61.28182864189148,
+  "peak_gpu_memory_mb": 1121.7548828125,
+  "trainable_params": 22272102,
+  "total_params": 23717030,
+  "val_metrics": {
+    "epoch": 16,
+    "accuracy": 0.9323529411764706,
+    "f1_macro": 0.9319562015685317,
+    "loss": 0.35992160801794015
+  },
+  "test_metrics": {
+    "accuracy": 0.9092535371605139,
+    "precision_macro": 0.9093327153617013,
+    "recall_macro": 0.932943612806012,
+    "f1_macro": 0.9172902750707299,
+    "precision_weighted": 0.9187234345281909,
+    "recall_weighted": 0.9092535371605139,
+    "f1_weighted": 0.9089146029854122
+  },
+  "num_epochs_trained": 20
+}

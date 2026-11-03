@@ -1,0 +1,32 @@
+{
+  "experiment_id": "exp03_efficientnet_b0_full_finetune_100pct",
+  "experiment_name": "Full Fine-tuning / EfficientNet-B0 / 100% data",
+  "dataset_sizes": {
+    "train": 1020,
+    "val": 1020,
+    "test": 6149
+  },
+  "best_val_acc": 0.8754901960784314,
+  "best_epoch": 18,
+  "total_train_time_sec": 4316.277269363403,
+  "avg_epoch_time_sec": 215.81386346817015,
+  "peak_gpu_memory_mb": 2822.5537109375,
+  "trainable_params": 4138210,
+  "total_params": 4138210,
+  "val_metrics": {
+    "epoch": 18,
+    "accuracy": 0.8754901960784314,
+    "f1_macro": 0.8711464201600235,
+    "loss": 0.9360957075567806
+  },
+  "test_metrics": {
+    "accuracy": 0.8524963408684338,
+    "precision_macro": 0.8356613264889097,
+    "recall_macro": 0.8722940710814975,
+    "f1_macro": 0.843421001794242,
+    "precision_weighted": 0.8681873616774592,
+    "recall_weighted": 0.8524963408684338,
+    "f1_weighted": 0.8493481871495158
+  },
+  "num_epochs_trained": 20
+}

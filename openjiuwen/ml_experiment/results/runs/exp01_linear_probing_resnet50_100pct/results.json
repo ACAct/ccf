@@ -1,0 +1,32 @@
+{
+  "experiment_id": "exp01_linear_probing_resnet50_100pct",
+  "experiment_name": "Linear Probing / ResNet50 / 100% data",
+  "dataset_sizes": {
+    "train": 1020,
+    "val": 1020,
+    "test": 6149
+  },
+  "best_val_acc": 0.8598039215686275,
+  "best_epoch": 17,
+  "total_train_time_sec": 1188.2198173999786,
+  "avg_epoch_time_sec": 59.41099086999893,
+  "peak_gpu_memory_mb": 540.69873046875,
+  "trainable_params": 208998,
+  "total_params": 23717030,
+  "val_metrics": {
+    "epoch": 17,
+    "accuracy": 0.8598039215686275,
+    "f1_macro": 0.8598249032416672,
+    "loss": 0.7533420632867253
+  },
+  "test_metrics": {
+    "accuracy": 0.8373719303951862,
+    "precision_macro": 0.8259259322781111,
+    "recall_macro": 0.8608702461305882,
+    "f1_macro": 0.834621588676886,
+    "precision_weighted": 0.8533618249251312,
+    "recall_weighted": 0.8373719303951862,
+    "f1_weighted": 0.8373926067887513
+  },
+  "num_epochs_trained": 20
+}

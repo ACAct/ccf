@@ -1,0 +1,32 @@
+{
+  "experiment_id": "exp02_data_ratio_0.50_resnet50",
+  "experiment_name": "Full Fine-tuning / ResNet50 / 50% data",
+  "dataset_sizes": {
+    "train": 510,
+    "val": 1020,
+    "test": 6149
+  },
+  "best_val_acc": 0.8549019607843137,
+  "best_epoch": 16,
+  "total_train_time_sec": 2286.053518295288,
+  "avg_epoch_time_sec": 114.30267591476441,
+  "peak_gpu_memory_mb": 3063.390625,
+  "trainable_params": 23717030,
+  "total_params": 23717030,
+  "val_metrics": {
+    "epoch": 16,
+    "accuracy": 0.8549019607843137,
+    "f1_macro": 0.853737173503735,
+    "loss": 0.922557453548207
+  },
+  "test_metrics": {
+    "accuracy": 0.8160676532769556,
+    "precision_macro": 0.8225204787645617,
+    "recall_macro": 0.8547062783612493,
+    "f1_macro": 0.8230331797444268,
+    "precision_weighted": 0.8491799471671859,
+    "recall_weighted": 0.8160676532769556,
+    "f1_weighted": 0.8150878940345407
+  },
+  "num_epochs_trained": 20
+}

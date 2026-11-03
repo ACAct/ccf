@@ -1,0 +1,19 @@
+# 数据集（约 675MB，不提交，用 prepare_dataset.py 重新下载）
+data/
+
+# 模型权重（大文件，不提交）
+*.pth
+
+# Python 字节码缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 训练日志（运行时生成）
+*.log
+
+# 内部/隐私文档（不公开）
+request.md
+我的工作流.md
+对接信息.md
+对接信息.txt

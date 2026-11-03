@@ -1,0 +1,11 @@
+# ResearchPilot 机器学习实验模块依赖
+# Python 3.13，安装方式：
+#   pip install -r requirements.txt
+# 说明：本模块用自定义加载器读取 fast.ai 镜像（jpg + txt 标签），
+#       不再依赖 torchvision 的 Flowers102（原需 scipy 读 .mat），scipy 为可选。
+
+torch>=2.0.0
+torchvision>=0.15.0
+numpy
+matplotlib
+Pillow

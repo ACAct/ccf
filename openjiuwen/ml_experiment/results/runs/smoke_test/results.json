@@ -1,0 +1,32 @@
+{
+  "experiment_id": "smoke_test",
+  "experiment_name": "Smoke Test: quick run to verify pipeline",
+  "dataset_sizes": {
+    "train": 102,
+    "val": 1020,
+    "test": 6149
+  },
+  "best_val_acc": 0.0784313725490196,
+  "best_epoch": 2,
+  "total_train_time_sec": 23.952025651931763,
+  "avg_epoch_time_sec": 11.976012825965881,
+  "peak_gpu_memory_mb": 1763.6337890625,
+  "trainable_params": 23717030,
+  "total_params": 23717030,
+  "val_metrics": {
+    "epoch": 2,
+    "accuracy": 0.0784313725490196,
+    "f1_macro": 0.04633227758856797,
+    "loss": 4.451687319138471
+  },
+  "test_metrics": {
+    "accuracy": 0.0848918523337128,
+    "precision_macro": 0.08801446292014092,
+    "recall_macro": 0.08608119907573053,
+    "f1_macro": 0.04918642140166973,
+    "precision_weighted": 0.1413419044881652,
+    "recall_weighted": 0.0848918523337128,
+    "f1_weighted": 0.06821425700904155
+  },
+  "num_epochs_trained": 2
+}
