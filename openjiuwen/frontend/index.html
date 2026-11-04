@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="基于 JiuwenSwarm 的 Agent 科研任务管理与实验分析工作台">
+  <title>Jiuwen Research · 科研智能体工作台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="icon-tasks" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="icon-monitor" viewBox="0 0 24 24"><path d="M3 12h4l2.5-7 5 14 2.5-7h4"/></symbol>
+    <symbol id="icon-results" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="icon-paper" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3v-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1z"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="icon-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3M7.5 15h9"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m7 4 13 8-13 8z"/></symbol>
+    <symbol id="icon-stop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5M4 18v-5h5M18.5 9A7 7 0 0 0 6 6.5L4 11M5.5 15A7 7 0 0 0 18 17.5l2-4.5"/></symbol>
+    <symbol id="icon-gpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+    <symbol id="icon-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></symbol>
+    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 5.5v14"/></symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V3h8v3M19 6l-1 15H6L5 6M10 11v5M14 11v5"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#/tasks" aria-label="返回任务中心">
+        <span class="brand-mark"><span></span><span></span><span></span><span></span></span>
+        <span class="brand-copy"><strong>Jiuwen <em>Research</em></strong><small>科研智能体工作台</small></span>
+      </a>
+      <nav class="main-nav" aria-label="主导航">
+        <span class="nav-label">工作空间</span>
+        <a href="#/tasks" class="nav-item active" data-route="tasks"><svg><use href="#icon-tasks"/></svg><span>任务中心</span><span class="nav-count" id="nav-task-count">0</span></a>
+        <a href="#/monitor" class="nav-item" data-route="monitor"><svg><use href="#icon-monitor"/></svg><span>实验监控</span></a>
+        <a href="#/results" class="nav-item" data-route="results"><svg><use href="#icon-results"/></svg><span>结果分析</span></a>
+        <a href="#/paper" class="nav-item" data-route="paper"><svg><use href="#icon-paper"/></svg><span>论文展示</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="workflow-note">
+          <div class="workflow-note-icon"><svg><use href="#icon-layers"/></svg></div>
+          <div><strong>全流程科研自动化</strong><span>选题 · 调研 · 实验 · 写作</span></div>
+        </div>
+        <button class="interface-button" id="open-settings"><svg><use href="#icon-settings"/></svg><span>数据源与接口说明</span><svg class="chevron"><use href="#icon-chevron"/></svg></button>
+        <div class="system-status"><span class="status-dot"></span><span id="system-status-text">前端服务已就绪</span><small>v1.0</small></div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="page-heading">
+          <button class="icon-button mobile-menu" id="mobile-menu" aria-label="打开导航"><svg><use href="#icon-menu"/></svg></button>
+          <div><div class="breadcrumb">JiuwenSwarm <span>/</span> 科研工作空间</div><h1 id="page-title">任务中心</h1></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="data-source-button" id="data-source-button" title="配置数据源"><span class="status-dot demo"></span><span id="data-source-label">演示数据</span><svg><use href="#icon-settings"/></svg></button>
+          <button class="button button-primary" id="new-task-button"><svg><use href="#icon-plus"/></svg>新建科研任务</button>
+        </div>
+      </header>
+
+      <main class="main-content" id="main-content">
+        <section class="view active" id="view-tasks" aria-labelledby="page-title">
+          <div class="welcome-strip">
+            <div><span class="eyebrow">AGENTIC RESEARCH WORKSPACE</span><h2>让科研流程清晰可查，让实验结果真实可溯。</h2><p>从一个研究想法出发，跟踪智能体完成文献调研、方法设计、实验验证与论文生成。</p></div>
+            <div class="welcome-orbit" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit-core"><svg><use href="#icon-flask"/></svg></span><i></i><i></i><i></i></div>
+          </div>
+          <div class="stat-grid" id="task-stats"></div>
+          <div class="task-layout">
+            <section class="card task-card">
+              <div class="card-header task-list-header"><div><h3>科研任务</h3><p>查看并管理所有智能体科研任务</p></div><div class="task-tools"><label class="search-box"><svg><use href="#icon-search"/></svg><input id="task-search" type="search" placeholder="搜索任务" aria-label="搜索任务"></label><select id="task-filter" aria-label="按状态筛选"><option value="all">全部状态</option><option value="running">运行中</option><option value="completed">已完成</option><option value="queued">排队中</option><option value="failed">异常</option></select></div></div>
+              <div class="table-wrap"><table class="data-table task-table"><thead><tr><th>任务名称</th><th>研究方向</th><th>状态</th><th>当前阶段</th><th>最近更新</th><th><span class="sr-only">操作</span></th></tr></thead><tbody id="task-list"></tbody></table></div>
+              <div class="table-footer" id="task-list-footer"></div>
+            </section>
+            <aside class="card pipeline-card">
+              <div class="card-header"><div><h3>科研 Agent 工作流</h3><p>标准化全流程协作</p></div><span class="soft-badge">5 个阶段</span></div>
+              <div class="pipeline-list" id="global-pipeline"></div>
+              <div class="pipeline-tip"><svg><use href="#icon-info"/></svg><p>每个阶段均保留执行状态与产物，点击任务可进入对应实验监控。</p></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-monitor"><div id="monitor-content"></div></section>
+        <section class="view" id="view-results"><div id="results-content"></div></section>
+        <section class="view" id="view-paper"><div id="paper-content"></div></section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay" hidden></div>
+  <dialog class="modal create-modal" id="create-task-dialog">
+    <form id="create-task-form">
+      <div class="modal-header"><div><span class="eyebrow">NEW RESEARCH TASK</span><h2>创建科研任务</h2><p>明确研究方向与实验配置，剩余流程交给科研 Agent。</p></div><button type="button" class="icon-button" data-close="create-task-dialog" aria-label="关闭"><svg><use href="#icon-close"/></svg></button></div>
+      <div class="modal-body">
+        <div class="form-field full"><label for="task-title">任务名称 <span>*</span></label><input id="task-title" name="title" required maxlength="80" placeholder="例如：面向长程任务的分层记忆机制研究"></div>
+        <div class="form-field full"><label for="research-direction">研究方向 <span>*</span></label><select id="research-direction" name="research_direction" required><option value="Agent记忆引擎设计">Agent 记忆引擎设计</option><option value="Agent上下文工程设计">Agent 上下文工程设计</option><option value="Agent自演进">Agent 自演进</option></select></div>
+        <div class="form-field full"><label for="task-description">研究设想</label><textarea id="task-description" name="description" rows="3" placeholder="描述希望验证的研究问题、核心假设或预期贡献"></textarea></div>
+        <div class="form-section-title"><svg><use href="#icon-flask"/></svg>实验配置</div>
+        <div class="form-grid">
+          <div class="form-field"><label for="task-model">基础模型</label><select id="task-model" name="model"><option>Qwen2.5-7B-Instruct</option><option>Qwen2.5-14B-Instruct</option><option>Llama-3.1-8B-Instruct</option></select></div>
+          <div class="form-field"><label for="task-strategy">实验策略</label><select id="task-strategy" name="strategy"><option value="LoRA">LoRA 微调</option><option value="QLoRA">QLoRA 微调</option><option value="Full Fine-tuning">全参数微调</option><option value="Prompt Only">仅提示词</option></select></div>
+          <div class="form-field"><label for="task-epochs">训练轮次</label><input id="task-epochs" name="epochs" type="number" min="1" max="200" value="30" required></div>
+          <div class="form-field"><label for="task-ratio">训练数据比例 <output id="ratio-output">80%</output></label><input id="task-ratio" name="data_ratio" type="range" min="10" max="100" step="10" value="80"></div>
+        </div>
+        <div class="form-hint"><svg><use href="#icon-info"/></svg>创建后将进入选题拆解阶段；实验参数会同步给实验执行成员。</div>
+      </div>
+      <div class="modal-footer"><button type="button" class="button button-secondary" data-close="create-task-dialog">取消</button><button type="submit" class="button button-primary" id="create-task-submit"><svg><use href="#icon-plus"/></svg>创建并启动</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal settings-modal" id="settings-dialog">
+    <form id="settings-form">
+      <div class="modal-header"><div><span class="eyebrow">DATA & API</span><h2>数据源与接口说明</h2><p>演示模式用于界面验收，真实模式用于联调成员一与成员二的成果。</p></div><button type="button" class="icon-button" data-close="settings-dialog" aria-label="关闭"><svg><use href="#icon-close"/></svg></button></div>
+      <div class="modal-body">
+        <div class="source-options">
+          <label class="source-option"><input type="radio" name="mode" value="demo"><span class="source-radio"></span><span><strong>演示数据</strong><small>内置完整科研任务，便于离线预览和交互测试</small></span><span class="soft-badge">默认</span></label>
+          <label class="source-option"><input type="radio" name="mode" value="real"><span class="source-radio"></span><span><strong>真实数据源</strong><small>调用任务 API，读取真实日志、指标与实验曲线</small></span></label>
+        </div>
+        <div class="form-grid real-config">
+          <div class="form-field full"><label for="api-base">任务 API 地址</label><input id="api-base" name="apiBase" type="url" placeholder="留空则使用当前站点"><small>例如 http://127.0.0.1:8000，前端会请求该地址下的 /api/tasks</small></div>
+          <div class="form-field full"><label for="asset-base">实验文件根路径</label><input id="asset-base" name="assetBase" placeholder="留空则使用当前站点"><small>该路径下应包含 logs/ 与 results/runs/</small></div>
+        </div>
+        <div class="interface-docs">
+          <h3>成员一 · 任务接口约定</h3>
+          <div class="endpoint"><span class="method get">GET</span><code>/api/tasks</code><span>任务列表</span></div>
+          <div class="endpoint"><span class="method post">POST</span><code>/api/tasks</code><span>创建任务</span></div>
+          <div class="endpoint"><span class="method get">GET</span><code>/api/tasks/{id}</code><span>任务详情</span></div>
+          <div class="endpoint"><span class="method post">POST</span><code>/api/tasks/{id}/actions</code><span>start / pause / resume / stop</span></div>
+          <div class="endpoint"><span class="method get">GET</span><code>/api/tasks/{id}/paper</code><span>论文内容</span></div>
+          <h3>成员二 · 实验文件约定</h3>
+          <div class="file-contract"><code>results/runs/&lt;experiment_id&gt;/config.json</code><span>不存在时回退到根目录 config.json</span></div>
+          <div class="file-contract"><code>logs/&lt;experiment_id&gt;.log</code><span>逐行日志，最后一行作为最新训练状态</span></div>
+          <div class="file-contract"><code>results/runs/&lt;experiment_id&gt;/metrics.json</code><span>验证集与测试集指标</span></div>
+          <div class="file-contract"><code>results/runs/&lt;experiment_id&gt;/loss_curve.png</code><span>损失曲线</span></div>
+          <div class="file-contract"><code>results/runs/&lt;experiment_id&gt;/accuracy_curve.png</code><span>准确率曲线</span></div>
+          <p class="docs-note">日志支持 JSON Lines，或包含 epoch、train_loss、train_acc、val_loss、val_acc、val_f1、lr 的键值文本。真实模式下文件服务需允许浏览器跨域读取。</p>
+        </div>
+      </div>
+      <div class="modal-footer"><span class="save-note">设置仅保存在当前浏览器</span><button type="submit" class="button button-primary">保存并重新连接</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="api.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
