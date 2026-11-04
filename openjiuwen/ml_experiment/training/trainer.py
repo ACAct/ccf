@@ -20,6 +20,7 @@ import torch
 import torch.nn as nn
 
 from evaluation.metrics import compute_metrics
+from strategies.finetune import _set_train_mode_with_frozen_bn
 
 
 def _resolve_optimizer(name):
@@ -63,6 +64,8 @@ class Trainer:
             "val_f1_macro": [],
             "lr": [],
             "epoch_time_sec": [],
+            "train_time_sec": [],
+            "val_time_sec": [],
         }
 
     def _build_optimizer(self):
@@ -95,7 +98,7 @@ class Trainer:
         )
 
     def train_epoch(self):
-        self.model.train()
+        _set_train_mode_with_frozen_bn(self.model)
         running_loss, running_correct, total = 0.0, 0, 0
         for images, targets in self.train_loader:
             images = images.to(self.device)
@@ -154,8 +157,17 @@ class Trainer:
 
         for epoch in range(1, epochs + 1):
             ep_start = time.time()
+
+            # ── 训练 ──
+            train_start = time.time()
             train_loss, train_acc = self.train_epoch()
+            train_time = time.time() - train_start
+
+            # ── 验证 ──
+            val_start = time.time()
             val_loss, val_metrics = self.evaluate(self.val_loader)
+            val_time = time.time() - val_start
+
             ep_time = time.time() - ep_start
 
             lr = self.optimizer.param_groups[0]["lr"]
@@ -167,6 +179,8 @@ class Trainer:
             self.history["val_f1_macro"].append(val_metrics["f1_macro"])
             self.history["lr"].append(lr)
             self.history["epoch_time_sec"].append(ep_time)
+            self.history["train_time_sec"].append(train_time)
+            self.history["val_time_sec"].append(val_time)
 
             # 更新最优模型（按验证集 Accuracy）
             if val_metrics["accuracy"] > self.best_val_acc:
@@ -198,6 +212,8 @@ class Trainer:
         total_time = time.time() - total_start
         n_epochs = len(self.history["train_loss"])
         avg_epoch_time = total_time / n_epochs if n_epochs else 0.0
+        total_train_time = sum(self.history.get("train_time_sec", []))
+        total_val_time = sum(self.history.get("val_time_sec", []))
 
         peak_memory_mb = 0.0
         if self.device.type == "cuda":
@@ -210,6 +226,8 @@ class Trainer:
             "best_state": self.best_state,
             "final_state": copy.deepcopy(self.model.state_dict()),
             "total_train_time_sec": total_time,
+            "train_time_sec": total_train_time,
+            "val_time_sec": total_val_time,
             "avg_epoch_time_sec": avg_epoch_time,
             "peak_gpu_memory_mb": peak_memory_mb,
         }

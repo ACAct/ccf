@@ -116,7 +116,8 @@ def append_summary_csv(row, csv_path):
 
 
 def save_experiment_outputs(
-    config, run_summary, val_metrics, test_metrics, dataset_sizes, resource_info=None
+    config, run_summary, val_metrics, test_metrics, dataset_sizes, resource_info=None,
+    env_info=None,
 ):
     """
     保存一次实验的全部输出，返回各文件的路径字典。
@@ -128,6 +129,7 @@ def save_experiment_outputs(
         test_metrics: 测试集指标 dict。
         dataset_sizes: {"train": n, "val": n, "test": n}。
         resource_info: {"total_params": n, "trainable_params": n}。
+        env_info: collect_environment_info() 返回的环境信息 dict，可选。
     """
     resource_info = resource_info or {}
     experiment_id = config.get("experiment_id", "experiment")
@@ -141,6 +143,11 @@ def save_experiment_outputs(
 
     # 1) 配置快照（保证可复现）
     config_path = save_json(config, os.path.join(out_dir, "config.json"))
+
+    # 1.5) 环境信息
+    env_path = None
+    if env_info:
+        env_path = save_json(env_info, os.path.join(out_dir, "environment.json"))
 
     # 2) 结果 JSON（指标 + 资源统计 + 数据规模）
     results = {
@@ -187,6 +194,7 @@ def save_experiment_outputs(
         "output_dir": out_dir,
         "checkpoint_dir": ckpt_dir,
         "config_file": config_path,
+        "env_file": env_path,
         "results_file": results_path,
         "metrics_file": metrics_path,
         "history_file": history_path,

@@ -14,6 +14,20 @@
 import torch.nn as nn
 
 
+def _set_train_mode_with_frozen_bn(model):
+    """将模型置为 train 模式，但已冻结的 BatchNorm 保持 eval。
+
+    防止 Linear Probing 时 model.train() 把冻结特征提取器里的 BN
+    running_mean / running_var 意外更新。
+    """
+    model.train()
+    for m in model.modules():
+        if isinstance(m, nn.BatchNorm2d):
+            # 该 BN 层所有参数均冻结 → 保持 eval
+            if all(not p.requires_grad for p in m.parameters()):
+                m.eval()
+
+
 def _set_requires_grad(module, requires_grad):
     for p in module.parameters():
         p.requires_grad = requires_grad

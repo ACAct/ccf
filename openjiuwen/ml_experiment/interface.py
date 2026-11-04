@@ -26,7 +26,9 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 import json
 import logging
+import platform
 import random
+import subprocess
 import sys
 import traceback
 
@@ -39,6 +41,7 @@ from models.model_loader import (
     move_to_device,
     count_total_parameters,
     count_trainable_parameters,
+    SUPPORTED_MODELS,
 )
 from strategies.finetune import apply_strategy
 from training.trainer import Trainer
@@ -105,6 +108,78 @@ def load_config(config_path):
     return config
 
 
+# ---------------------------------------------------------------------------
+# 配置校验
+# ---------------------------------------------------------------------------
+
+SUPPORTED_STRATEGIES = {"linear_probing", "partial_finetune", "full_finetune"}
+SUPPORTED_DATASETS = {"oxford_flowers102"}
+SUPPORTED_OPTIMIZERS = {"adamw", "adam", "sgd"}
+SUPPORTED_SCHEDULERS = {"cosine", "step", "none", "off", ""}
+
+
+def validate_config(config):
+    """校验合并后的实验配置；失败时抛出含具体字段的 ValueError。"""
+    # ── 必需字段 ──
+    experiment_id = config.get("experiment_id", "")
+    if not experiment_id:
+        raise ValueError("experiment_id 不能为空")
+
+    # ── 数值范围 ──
+    epochs = config.get("epochs", 20)
+    if not isinstance(epochs, int) or epochs <= 0:
+        raise ValueError(f"epochs 必须为正整数，得到: {epochs}")
+
+    batch_size = config.get("batch_size", 32)
+    if not isinstance(batch_size, int) or batch_size <= 0:
+        raise ValueError(f"batch_size 必须为正整数，得到: {batch_size}")
+
+    lr = config.get("learning_rate", 1e-4)
+    if not isinstance(lr, (int, float)) or lr <= 0:
+        raise ValueError(f"learning_rate 必须 > 0，得到: {lr}")
+
+    data_ratio = config.get("data_ratio", 1.0)
+    if not isinstance(data_ratio, (int, float)) or not (0 < data_ratio <= 1):
+        raise ValueError(f"data_ratio 必须在 (0, 1] 内，得到: {data_ratio}")
+
+    seed = config.get("seed", 42)
+    try:
+        int(seed)
+    except (ValueError, TypeError):
+        raise ValueError(f"seed 必须为合法整数，得到: {seed}")
+
+    # ── 枚举字段 ──
+    model = config.get("model", "")
+    if model.lower() not in SUPPORTED_MODELS:
+        raise ValueError(
+            f"不支持的 model: {model}，可选: {sorted(SUPPORTED_MODELS)}"
+        )
+
+    strategy = config.get("strategy", "")
+    if strategy.lower() not in SUPPORTED_STRATEGIES:
+        raise ValueError(
+            f"不支持的 strategy: {strategy}，可选: {sorted(SUPPORTED_STRATEGIES)}"
+        )
+
+    dataset = config.get("dataset", "")
+    if dataset.lower() not in SUPPORTED_DATASETS:
+        raise ValueError(
+            f"不支持的 dataset: {dataset}，可选: {sorted(SUPPORTED_DATASETS)}"
+        )
+
+    optimizer = config.get("optimizer", "adamw")
+    if optimizer.lower() not in SUPPORTED_OPTIMIZERS:
+        raise ValueError(
+            f"不支持的 optimizer: {optimizer}，可选: {sorted(SUPPORTED_OPTIMIZERS)}"
+        )
+
+    scheduler = config.get("scheduler", "cosine")
+    if scheduler.lower() not in SUPPORTED_SCHEDULERS:
+        raise ValueError(
+            f"不支持的 scheduler: {scheduler}，可选: {sorted(SUPPORTED_SCHEDULERS)}"
+        )
+
+
 def _setup_logger(config):
     """配置控制台 + 文件日志，返回 logger。"""
     experiment_id = config.get("experiment_id", "experiment")
@@ -125,6 +200,51 @@ def _setup_logger(config):
     logger.addHandler(fh)
     logger.addHandler(sh)
     return logger
+
+
+# ---------------------------------------------------------------------------
+# 环境信息采集
+# ---------------------------------------------------------------------------
+
+def _get_git_commit():
+    """返回 HEAD commit 短哈希；非 git 仓库或获取失败时返回 None。"""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return None
+
+
+def collect_environment_info():
+    """采集当前运行环境信息，返回 dict；获取失败不抛异常。"""
+    info = {
+        "python_version": sys.version.split(" ", 1)[0] if sys.version else None,
+        "torch_version": torch.__version__,
+        "torchvision_version": None,
+        "cuda_available": torch.cuda.is_available(),
+        "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+        "gpu_name": None,
+        "os": platform.platform(),
+        "git_commit": _get_git_commit(),
+    }
+    if torch.cuda.is_available():
+        try:
+            info["gpu_name"] = torch.cuda.get_device_name(0)
+        except Exception:
+            pass
+    try:
+        import torchvision
+        info["torchvision_version"] = torchvision.__version__
+    except Exception:
+        pass
+    return info
 
 
 # ---------------------------------------------------------------------------
@@ -161,6 +281,9 @@ def run_experiment(config_path, config_override=None):
         config = load_config(config_path)
         if config_override:
             config.update(config_override)
+
+        # ── 配置合法性校验 ──
+        validate_config(config)
 
         experiment_id = config.get("experiment_id", "experiment")
         seed = int(config.get("seed", 42))
@@ -216,8 +339,10 @@ def run_experiment(config_path, config_override=None):
         logger.info("测试集指标: %s", test_metrics)
 
         # 5) 保存输出
+        env_info = collect_environment_info()
         outputs = save_experiment_outputs(
-            config, run_summary, val_metrics, test_metrics, dataset_sizes, resource_info
+            config, run_summary, val_metrics, test_metrics, dataset_sizes,
+            resource_info, env_info,
         )
 
         # 6) 汇总 CSV（跨实验对比）
@@ -239,6 +364,8 @@ def run_experiment(config_path, config_override=None):
             "test_precision_macro": test_metrics.get("precision_macro"),
             "test_recall_macro": test_metrics.get("recall_macro"),
             "total_train_time_sec": round(run_summary["total_train_time_sec"], 3),
+            "train_time_sec": round(run_summary.get("train_time_sec", 0), 3),
+            "val_time_sec": round(run_summary.get("val_time_sec", 0), 3),
             "peak_gpu_memory_mb": round(run_summary["peak_gpu_memory_mb"], 3),
         }
         append_summary_csv(summary_row, config.get("summary_csv", "results/experiments_summary.csv"))
@@ -262,6 +389,8 @@ def run_experiment(config_path, config_override=None):
                 "total_params": total_params,
                 "trainable_params": trainable_params,
                 "total_train_time_sec": run_summary["total_train_time_sec"],
+                "train_time_sec": run_summary.get("train_time_sec", 0),
+                "val_time_sec": run_summary.get("val_time_sec", 0),
                 "avg_epoch_time_sec": run_summary["avg_epoch_time_sec"],
                 "peak_gpu_memory_mb": run_summary["peak_gpu_memory_mb"],
             },
