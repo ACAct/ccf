@@ -364,8 +364,6 @@ def run_experiment(config_path, config_override=None):
             "test_precision_macro": test_metrics.get("precision_macro"),
             "test_recall_macro": test_metrics.get("recall_macro"),
             "total_train_time_sec": round(run_summary["total_train_time_sec"], 3),
-            "train_time_sec": round(run_summary.get("train_time_sec", 0), 3),
-            "val_time_sec": round(run_summary.get("val_time_sec", 0), 3),
             "peak_gpu_memory_mb": round(run_summary["peak_gpu_memory_mb"], 3),
         }
         append_summary_csv(summary_row, config.get("summary_csv", "results/experiments_summary.csv"))
